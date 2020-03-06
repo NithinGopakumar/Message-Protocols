@@ -1,5 +1,6 @@
 from paho.mqtt.client import Client
-
+import time
+import json
 # client = Client()
 #
 #
@@ -16,8 +17,9 @@ from paho.mqtt.client import Client
 from Publisher.base_publisher import BasePublisher
 
 
-class MqttPublisher(BasePublisher):
+# time=time.time()
 
+class MqttPublisher(BasePublisher):
 
     def __init__(self, *args, **kwargs):
         self.client = None
@@ -28,10 +30,12 @@ class MqttPublisher(BasePublisher):
         self.client.connect(host=host)
         print("Connected")
 
-    def send_message(self,message, topic="test"):
-        self.client.publish(topic, message)
+    def send_message(self, message, topic="test"):
+        msg_size = len(message["message"])
+        message["sentAt"] = time.time()
+        message["size_in_BYTES"] = msg_size
+        self.client.publish(topic=topic, payload=json.dumps(message))
         print("Published")
 
     def close(self):
         pass
-
